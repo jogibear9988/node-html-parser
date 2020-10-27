@@ -1,4 +1,4 @@
-import NodeType from './type';
+import NodeType from './type.js';
 
 /**
  * Node Class as base class for TextNode and HTMLElement.

@@ -1,5 +1,5 @@
 {
-	"name": "node-html-parser",
+	"name": "@node-projects/ode-html-parser",
 	"version": "1.3.2",
 	"description": "A very fast HTML parser, generating a simplified DOM, with basic element query support.",
 	"main": "dist/index.js",
@@ -8,10 +8,8 @@
 		"test": "mocha",
 		"lint": "eslint ./src/*.ts ./src/**/*.ts",
 		"clean": "del-cli ./dist/",
-		"ts:cjs": "tsc -m commonjs",
-		"ts:umd": "tsc -t es5 -m amd -d false --outFile ./dist/main.js",
-		"ts:esm": "tsc -t esnext -m esnext -d false --outDir ./dist/esm/",
-		"build": "npm run lint && npm run clean && npm run ts:cjs && npm run ts:umd && npm run ts:esm",
+		"ts:esm": "tsc -d false",
+		"build": "npm run clean && npm run ts:esm",
 		"dev": "tsc -w",
 		"pretest": "tsc -m commonjs"
 	},
@@ -65,10 +63,10 @@
 	},
 	"repository": {
 		"type": "git",
-		"url": "https://github.com/taoqf/node-fast-html-parser.git"
+		"url": "https://github.com/node-projects/node-html-parser.git"
 	},
 	"bugs": {
-		"url": "https://github.com/taoqf/node-fast-html-parser/issues"
+		"url": "https://github.com/node-projects/node-html-parser/issues"
 	},
-	"homepage": "https://github.com/taoqf/node-fast-html-parser"
+	"homepage": "https://github.com/node-projects/node-html-parser"
 }

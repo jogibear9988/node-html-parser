@@ -1,3 +1,8 @@
+# ESM Fork
+
+This is a fork wich compiles to esm modules for usage direct in browser.
+You need to load javascript package "he" to the browser
+
 # Fast HTML Parser [![NPM version](https://badge.fury.io/js/node-html-parser.png)](http://badge.fury.io/js/node-html-parser) [![Build Status](https://travis-ci.org/taoqf/node-html-parser.svg?branch=master)](https://travis-ci.org/taoqf/node-html-parser)
 
 Fast HTML Parser is a _very fast_ HTML parser. Which will generate a simplified

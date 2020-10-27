@@ -1,10 +1,11 @@
-import { decode } from 'he';
-import Node from './node';
-import NodeType from './type';
-import TextNode from './text';
-import Matcher from '../matcher';
-import arr_back from '../back';
-import CommentNode from './comment';
+import Node from './node.js';
+import NodeType from './type.js';
+import TextNode from './text.js';
+import Matcher from '../matcher.js';
+import arr_back from '../back.js';
+import CommentNode from './comment.js';
+
+import 'he'
 
 export interface KeyAttributes {
 	id?: string;
@@ -131,7 +132,8 @@ export default class HTMLElement extends Node {
 	 * @return {string} text content
 	 */
 	public get text() {
-		return decode(this.rawText);
+		//@ts-ignore
+		return he.decode(this.rawText);
 	}
 	/**
 	 * Get structured Text (with '\n' etc.)
@@ -437,7 +439,8 @@ export default class HTMLElement extends Node {
 		const attrs = this.rawAttributes;
 		for (const key in attrs) {
 			const val = attrs[key] || '';
-			this._attrs[key] = decode(val);
+			//@ts-ignore
+			this._attrs[key] = he.decode(val);
 		}
 		return this._attrs;
 	}
@@ -503,7 +506,8 @@ export default class HTMLElement extends Node {
 		const attrs = this.rawAttributes;
 		attrs[key] = String(value);
 		if (this._attrs) {
-			this._attrs[key] = decode(attrs[key]);
+			//@ts-ignore
+			this._attrs[key] = he.decode(attrs[key]);
 		}
 		// Update rawString
 		this.rawAttrs = Object.keys(attrs).map((name) => {
