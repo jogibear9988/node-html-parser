@@ -5,8 +5,6 @@ import Matcher from '../matcher.js';
 import arr_back from '../back.js';
 import CommentNode from './comment.js';
 
-import 'he'
-
 export interface KeyAttributes {
 	id?: string;
 	class?: string;
