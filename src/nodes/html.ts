@@ -4,6 +4,7 @@ import TextNode from './text.js';
 import Matcher from '../matcher.js';
 import arr_back from '../back.js';
 import CommentNode from './comment.js';
+import parse from '../parse.js';
 
 export interface KeyAttributes {
 	id?: string;
@@ -65,11 +66,10 @@ export default class HTMLElement extends Node {
 	 *
 	 * @memberof HTMLElement
 	 */
-	public constructor(tagName: string, keyAttrs: KeyAttributes, private rawAttrs = '', public parentNode = null as Node) {
+	public constructor(tagName: string, keyAttrs: KeyAttributes, private rawAttrs = '', public parentNode = null as HTMLElement) {
 		super();
 		this.rawTagName = tagName;
 		this.rawAttrs = rawAttrs || '';
-		this.parentNode = parentNode || null;
 		this.childNodes = [];
 		if (keyAttrs.id) {
 			this.id = keyAttrs.id;
@@ -89,6 +89,18 @@ export default class HTMLElement extends Node {
 			}
 		}
 	}
+
+	/**
+	 * Remove current element
+	 */
+	public remove() {
+		if (this.parentNode) {
+			const children = this.parentNode.childNodes;
+			this.parentNode.childNodes = children.filter((child) => {
+				return this !== child;
+			});
+		}
+	}
 	/**
 	 * Remove Child element from childNodes array
 	 * @param {HTMLElement} node     node to remove
@@ -104,17 +116,16 @@ export default class HTMLElement extends Node {
 	 * @param {HTMLElement} newNode     new node
 	 */
 	public exchangeChild(oldNode: Node, newNode: Node) {
-		let idx = -1;
-		for (let i = 0; i < this.childNodes.length; i++) {
-			if (this.childNodes[i] === oldNode) {
-				idx = i;
-				break;
+		const children = this.childNodes;
+		this.childNodes = children.map((child) => {
+			if (child === oldNode) {
+				return newNode;
 			}
-		}
-		this.childNodes[idx] = newNode;
+			return child;
+		});
 	}
 	public get tagName() {
-		return this.rawTagName?.toUpperCase();
+		return this.rawTagName ? this.rawTagName.toUpperCase() : this.rawTagName;
 	}
 	/**
 	 * Get escpaed (as-it) text value of current node and its children.
@@ -545,7 +556,7 @@ export default class HTMLElement extends Node {
 		if (arguments.length < 2) {
 			throw new Error('2 arguments required');
 		}
-		const p = parse(html) as HTMLElement;
+		const p = parse(html);
 		if (where === 'afterend') {
 			const idx = this.parentNode.childNodes.findIndex((child) => {
 				return child === this;
@@ -579,6 +590,39 @@ export default class HTMLElement extends Node {
 		// 	return;
 		// }
 	}
+
+	public get nextSibling() {
+		if (this.parentNode) {
+			const children = this.parentNode.childNodes;
+			let i = 0;
+			while (i < children.length) {
+				const child = children[i++];
+				if (this === child) {
+					return children[i] || null;
+				}
+			}
+			return null;
+		}
+	}
+
+	public get nextElementSibling() {
+		if (this.parentNode) {
+			const children = this.parentNode.childNodes;
+			let i = 0;
+			let find = false;
+			while (i < children.length) {
+				const child = children[i++];
+				if (find) {
+					if (child instanceof HTMLElement) {
+						return child || null;
+					}
+				} else if (this === child) {
+					find = true;
+				}
+			}
+			return null;
+		}
+	}
 }
 
 // https://html.spec.whatwg.org/multipage/custom-elements.html#valid-custom-element-name
@@ -608,7 +652,15 @@ const kSelfClosingElements = {
 	meta: true,
 	META: true,
 	source: true,
-	SOURCE: true
+	SOURCE: true,
+	embed: true,
+	EMBED: true,
+	param: true,
+	PARAM: true,
+	track: true,
+	TRACK: true,
+	wbr: true,
+	WBR: true
 };
 const kElementsClosedByOpening = {
 	li: { li: true, LI: true },
@@ -650,23 +702,13 @@ const kElementsClosedByClosing = {
 	th: { tr: true, table: true, TR: true, TABLE: true },
 	TH: { tr: true, table: true, TR: true, TABLE: true }
 };
-const kBlockTextElements = {
-	script: true,
-	SCRIPT: true,
-	noscript: true,
-	NOSCRIPT: true,
-	style: true,
-	STYLE: true,
-	pre: true,
-	PRE: true
-};
 
 export interface Options {
 	lowerCaseTagName: boolean;
-	script: boolean;
-	style: boolean;
-	pre: boolean;
 	comment: boolean;
+	blockTextElements: {
+		[tag: string]: boolean;
+	};
 }
 
 const frameflag = 'documentfragmentcontainer';
@@ -677,10 +719,32 @@ const frameflag = 'documentfragmentcontainer';
  * @param  {string} data      html
  * @return {HTMLElement}      root element
  */
-export function parse(data: string, options?: Options): HTMLElement & { valid: boolean };
-export function parse(data: string, options?: Options & { noFix: false }): HTMLElement & { valid: boolean };
-export function parse(data: string, options?: Options & { noFix: true }): (HTMLElement | TextNode) & { valid: boolean };
-export function parse(data: string, options = { pre: true, style: true, script: true, lowerCaseTagName: false, comment: false } as Options & { noFix?: boolean }) {
+export function base_parse(data: string, options = { lowerCaseTagName: false, comment: false } as Partial<Options>) {
+	const elements = options.blockTextElements || {
+		script: true,
+		noscript: true,
+		style: true,
+		pre: true
+	};
+	const element_names = Object.keys(elements);
+	const kBlockTextElements = element_names.map((it) => {
+		return new RegExp(it, 'i');
+	});
+	const kIgnoreElements = element_names.filter((it) => {
+		return elements[it];
+	}).map((it) => {
+		return new RegExp(it, 'i');
+	});
+	function element_should_be_ignore(tag: string) {
+		return kIgnoreElements.some((it) => {
+			return it.test(tag);
+		});
+	}
+	function is_block_text_element(tag: string) {
+		return kBlockTextElements.some((it) => {
+			return it.test(tag);
+		});
+	}
 	const root = new HTMLElement(null, {});
 	let currentParent = root;
 	const stack = [root];
@@ -730,7 +794,7 @@ export function parse(data: string, options = { pre: true, style: true, script: 
 			// https://github.com/taoqf/node-html-parser/issues/38
 			currentParent = currentParent.appendChild(new HTMLElement(match[2], attrs, match[3]));
 			stack.push(currentParent);
-			if (kBlockTextElements[match[2]]) {
+			if (is_block_text_element(match[2])) {
 				// a little test to find next </script> or </style> ...
 				const closeMarkup = `</${match[2]}>`;
 				const index = (() => {
@@ -739,7 +803,7 @@ export function parse(data: string, options = { pre: true, style: true, script: 
 					}
 					return data.indexOf(closeMarkup, kMarkupPattern.lastIndex);
 				})();
-				if (options[match[2]]) {
+				if (element_should_be_ignore(match[2])) {
 					let text: string;
 					if (index === -1) {
 						// there is no matching ending for the text element.
@@ -782,43 +846,5 @@ export function parse(data: string, options = { pre: true, style: true, script: 
 			}
 		}
 	}
-	type Response = (HTMLElement | TextNode) & { valid: boolean };
-	const valid = Boolean(stack.length === 1);
-	if (!options.noFix) {
-		const response = root as Response;
-		response.valid = valid;
-		while (stack.length > 1) {
-			// Handle each error elements.
-			const last = stack.pop();
-			const oneBefore = arr_back(stack);
-			if (last.parentNode && (last.parentNode as HTMLElement).parentNode) {
-				if (last.parentNode === oneBefore && last.tagName === oneBefore.tagName) {
-					// Pair error case <h3> <h3> handle : Fixes to <h3> </h3>
-					oneBefore.removeChild(last);
-					last.childNodes.forEach((child) => {
-						(oneBefore.parentNode as HTMLElement).appendChild(child);
-					});
-					stack.pop();
-				} else {
-					// Single error  <div> <h3> </div> handle: Just removes <h3>
-					oneBefore.removeChild(last);
-					last.childNodes.forEach((child) => {
-						oneBefore.appendChild(child);
-					});
-				}
-			} else {
-				// If it's final element just skip.
-			}
-		}
-		response.childNodes.forEach((node) => {
-			if (node instanceof HTMLElement) {
-				node.parentNode = null;
-			}
-		});
-		return response;
-	}
-	const response = new TextNode(data) as Response;
-	response.valid = valid;
-	return response;
-
+	return stack;
 }

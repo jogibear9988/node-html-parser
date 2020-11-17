@@ -67,7 +67,7 @@ var HTMLParser = require('node-html-parser');
 var root = HTMLParser.parse('<ul id="list"><li>Hello World</li></ul>');
 ```
 
-## HTMLElement Methods
+## Global Methods
 
 ### parse(data[, options])
 
@@ -79,12 +79,21 @@ Parse given data, and return root of the generated DOM.
   ```js
   {
     lowerCaseTagName: false,  // convert tag name to lower case (hurt performance heavily)
-    script: true,            // retrieve content in <script> (hurt performance slightly)
-    style: true,             // retrieve content in <style> (hurt performance slightly)
-    pre: true,               // retrieve content in <pre> (hurt performance slightly)
     comment: false            // retrieve comments (hurt performance slightly)
+    blockTextElements: {
+      script: true,	// keep text content when parsing
+      noscript: true,	// keep text content when parsing
+      style: true,		// keep text content when parsing
+      pre: true			// keep text content when parsing
+    }
   }
   ```
+
+### valid(data[, options])
+
+Parse given data, return the root element if the givent data is valid, and return false if not valid.
+
+## HTMLElement Methods
 
 ### HTMLElement#trimRight()
 
@@ -142,6 +151,10 @@ Same as [outerHTML](#htmlelementouterhtml)
 
 Set content. **Notice**: Do not set content of the **root** node.
 
+### HTMLElement#remove()
+
+Remove current element.
+
 ## HTMLElement Properties
 
 ### HTMLElement#text
@@ -177,3 +190,11 @@ Get innerHTML.
 ### HTMLElement#outerHTML
 
 Get outerHTML.
+
+### HTMLElement#nextSibling
+
+Returns a reference to the next child node of the current element's parent.
+
+### HTMLElement#nextElementSibling
+
+Returns a reference to the next child element of the current element's parent.

@@ -74,7 +74,7 @@ describe('HTML Parser', function () {
 				lowerCaseTagName: true
 			});
 
-			const div = new HTMLElement('div', {}, '');
+			const div = new HTMLElement('div', {}, '', root);
 			const a = div.appendChild(new HTMLElement('a', {}, ''));
 			const img = a.appendChild(new HTMLElement('img', {}, ''));
 			const p = div.appendChild(new HTMLElement('p', {}, ''));
@@ -99,7 +99,7 @@ describe('HTML Parser', function () {
 
 			const root = parseHTML('<div><a><img/></a><p></p></div>');
 
-			const div = new HTMLElement('div', {}, '');
+			const div = new HTMLElement('div', {}, '', root);
 			const a = div.appendChild(new HTMLElement('a', {}, ''));
 			const img = a.appendChild(new HTMLElement('img', {}, ''));
 			const p = div.appendChild(new HTMLElement('p', {}, ''));
@@ -111,7 +111,7 @@ describe('HTML Parser', function () {
 		it('should parse "<div><a><!-- my comment --></a></div>" and return root element without comments', function () {
 			const root = parseHTML('<div><a><!-- my comment --></a></div>');
 
-			const div = new HTMLElement('div', {}, '');
+			const div = new HTMLElement('div', {}, '', root);
 			const a = div.appendChild(new HTMLElement('a', {}, ''));
 
 			root.firstChild.should.eql(div);
@@ -120,7 +120,7 @@ describe('HTML Parser', function () {
 		it('should parse "<div><a><!-- my comment --></a></div>" and return root element with comments', function () {
 			const root = parseHTML('<div><a><!-- my comment --></a></div>', { comment: true });
 
-			const div = new HTMLElement('div', {}, '');
+			const div = new HTMLElement('div', {}, '', root);
 			const a = div.appendChild(new HTMLElement('a', {}, ''));
 			const comment = a.appendChild(new CommentNode(' my comment '));
 
@@ -130,7 +130,7 @@ describe('HTML Parser', function () {
 		it('should not parse HTML inside comments', function () {
 			const root = parseHTML('<div><!--<a></a>--></div>', { comment: true });
 
-			const div = new HTMLElement('div', {}, '');
+			const div = new HTMLElement('div', {}, '', root);
 			const comment = div.appendChild(new CommentNode('<a></a>'));
 
 			root.firstChild.should.eql(div);
@@ -140,7 +140,7 @@ describe('HTML Parser', function () {
 
 			const root = parseHTML('<picture><source srcset="/images/example-1.jpg 1200w, /images/example-2.jpg 1600w" sizes="100vw"><img src="/images/example.jpg" alt="Example"/></picture>');
 
-			const picture = new HTMLElement('picture', {}, '');
+			const picture = new HTMLElement('picture', {}, '', root);
 			const source = picture.appendChild(new HTMLElement('source', {}, 'srcset="/images/example-1.jpg 1200w, /images/example-2.jpg 1600w" sizes="100vw"'));
 			const img = picture.appendChild(new HTMLElement('img', {}, 'src="/images/example.jpg" alt="Example"'));
 
@@ -217,78 +217,6 @@ describe('HTML Parser', function () {
 		});
 	});
 
-	describe('parseWithValidation', function () {
-		// parse with validation tests
-
-		it('should return Object with valid: true.  does not count <p><p></p> as error. instead fixes it to <p></p><p></p>', function () {
-			const result = parseHTML('<p><p></p>');
-			result.valid.should.eql(true);
-		})
-
-		it('should return Object with valid: true.  does not count <p><p/></p> as error. instead fixes it to <p><p></p></p>', function () {
-			const result = parseHTML('<p><p/></p>');
-			result.valid.should.eql(true);
-		})
-
-		it('should return Object with valid: false.  does not count <p><h3></p> as error', function () {
-			const result = parseHTML('<p><h3></p>');
-			result.valid.should.eql(false);
-		})
-
-		it('hillcrestpartyrentals.html  should return Object with valid: false.  not closing <p> tag on line 476', function () {
-			const result = parseHTML(fs.readFileSync(__dirname + '/html/hillcrestpartyrentals.html').toString(), {
-				noFix: true
-			});
-			result.valid.should.eql(false);
-		})
-
-		it('google.html  should return Object with valid: true', function () {
-			const result = parseHTML(fs.readFileSync(__dirname + '/html/google.html').toString(), {
-				noFix: true
-			});
-			result.valid.should.eql(true);
-		})
-
-		it('gmail.html  should return Object with valid: true', function () {
-			const result = parseHTML(fs.readFileSync(__dirname + '/html/gmail.html').toString(), {
-				noFix: true
-			});
-			result.valid.should.eql(true);
-		})
-
-		it('ffmpeg.html  should return Object with valid: false (extra opening <div>', function () {
-			const result = parseHTML(fs.readFileSync(__dirname + '/html/ffmpeg.html').toString(), {
-				noFix: true
-			});
-			result.valid.should.eql(false);
-		})
-
-		// fix issue speed test
-
-		it('should fix "<div><h3><h3><div>" to "<div><h3></h3></div>"', function () {
-			const result = parseHTML('<div data-id=1><h3 data-id=2><h3><div>');
-			result.valid.should.eql(false);
-			result.toString().should.eql('<div data-id=1><h3 data-id=2></h3></div>');
-		})
-
-		it('should fix "<div><h3><h3><span><span><div>" to "<div><h3></h3><span></span></div>"', function () {
-			const result = parseHTML('<div><h3><h3><span><span><div>');
-			result.valid.should.eql(false);
-			result.toString().should.eql('<div><h3></h3><span></span></div>');
-		})
-
-		it('gmail.html  should return Object with valid: true', function () {
-			const result = parseHTML(fs.readFileSync(__dirname + '/html/gmail.html').toString().replace(/<\//gi, '<'));
-			result.valid.should.eql(false);
-		})
-
-		it('gmail.html  should return Object with valid: true', function () {
-			const result = parseHTML(fs.readFileSync(__dirname + '/html/nice.html').toString().replace(/<\//gi, '<'));
-			result.valid.should.eql(false);
-		})
-
-	});
-
 	describe('TextNode', function () {
 		it('#isWhitespace', function () {
 			let node = new TextNode('');
@@ -311,7 +239,7 @@ describe('HTML Parser', function () {
 			it('should remove whitespaces while preserving nodes with content', function () {
 				const root = parseHTML('<p> \r \n  \t <h5> 123 </h5></p>');
 
-				const p = new HTMLElement('p', {}, '');
+				const p = new HTMLElement('p', {}, '', root);
 				p.appendChild(new HTMLElement('h5', {}, ''))
 					.appendChild(new TextNode('123'));
 
@@ -457,53 +385,6 @@ describe('HTML Parser', function () {
 			});
 		});
 
-		describe('#querySelector()', function () {
-			it('should return correct elements in DOM tree', function () {
-				const root = parseHTML('<a id="id" data-id="myid"><div><span class="a b"></span><span></span><span></span></div></a>');
-				root.querySelector('#id').should.eql(root.firstChild);
-				root.querySelector('span.a').should.eql(root.firstChild.firstChild.firstChild);
-				root.querySelector('span.b').should.eql(root.firstChild.firstChild.firstChild);
-				root.querySelector('span.a.b').should.eql(root.firstChild.firstChild.firstChild);
-				root.querySelector('#id .b').should.eql(root.firstChild.firstChild.firstChild);
-				root.querySelector('#id span').should.eql(root.firstChild.firstChild.firstChild);
-				root.querySelector('[data-id=myid]').should.eql(root.firstChild);
-				root.querySelector('[data-id="myid"]').should.eql(root.firstChild);
-			});
-		});
-
-		describe('#querySelectorAll()', function () {
-			it('should return correct elements in DOM tree', function () {
-				const root = parseHTML('<a id="id"><div><span class="a b"></span><span></span><span></span></div></a>');
-				root.querySelectorAll('#id').should.eql([root.firstChild]);
-				root.querySelectorAll('span.a').should.eql([root.firstChild.firstChild.firstChild]);
-				root.querySelectorAll('span.b').should.eql([root.firstChild.firstChild.firstChild]);
-				root.querySelectorAll('span.a.b').should.eql([root.firstChild.firstChild.firstChild]);
-				root.querySelectorAll('#id .b').should.eql([root.firstChild.firstChild.firstChild]);
-				root.querySelectorAll('#id span').should.eql(root.firstChild.firstChild.childNodes);
-				root.querySelectorAll('#id, #id .b').should.eql([root.firstChild, root.firstChild.firstChild.firstChild]);
-			});
-			it('should return just one element', function () {
-				const root = parseHTML('<time class="date">');
-				root.querySelectorAll('time,.date').should.eql([root.firstChild]);
-			});
-			it.skip('should return elements in order', function () {
-				const root = parseHTML('<img src=""><p>hello</p>');
-				const img = root.firstChild;
-				const p = root.childNodes[1];
-				const [f, s] = root.querySelectorAll('p,img');
-				f.should.eql(img);
-				s.should.eql(p);
-			});
-			it.skip('should query multiple nodes', function () {
-				const root = parseHTML('<a id="id"><div class="b"><span class="a b"></span><span></span><span></span></div></a>');
-				const a = root.firstChild;
-				const div = a.firstChild;
-				const span = div.firstChild;
-				root.querySelectorAll('#id span').should.eql(div.childNodes);
-				root.querySelectorAll('#id .b').should.eql([div, span]);
-			});
-		});
-
 		describe('#structuredText', function () {
 			it('should return correct structured text', function () {
 				const root = parseHTML('<span>o<p>a</p><p>b</p>c</span>');
@@ -539,7 +420,7 @@ describe('HTML Parser', function () {
 			it('set content pre', function () {
 				const root = parseHTML(`<html><head></head><body></body></html>`);
 				const body = root.querySelector("body");
-				body.set_content(`<pre>this    is some    preformatted    text</pre>`, { pre: true });
+				body.set_content(`<pre>this    is some    preformatted    text</pre>`);
 				root.toString().should.eql('<html><head></head><body><pre>this    is some    preformatted    text</pre></body></html>')
 			});
 		});
