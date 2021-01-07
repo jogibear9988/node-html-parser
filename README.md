@@ -24,11 +24,12 @@ npm install --save node-html-parser
 Faster than htmlparser2!
 
 ```shell
-node-html-parser:2.02346 ms/file ± 2.21481
-htmlparser      :26.0810 ms/file ± 171.313
-htmlparser2     :4.49111 ms/file ± 6.85512
-parse5          :14.8590 ms/file ± 10.9427
-high5           :7.71818 ms/file ± 4.88375
+htmlparser      :26.7111 ms/file ± 170.066
+cheerio         :24.2480 ms/file ± 17.1711
+parse5          :13.7239 ms/file ± 8.68561
+high5           :7.75466 ms/file ± 5.33549
+htmlparser2     :5.27376 ms/file ± 8.68456
+node-html-parser:2.85768 ms/file ± 2.87784
 ```
 
 Tested with [htmlparser-benchmark](https://github.com/AndreasMadsen/htmlparser-benchmark).
@@ -91,7 +92,7 @@ Parse given data, and return root of the generated DOM.
 
 ### valid(data[, options])
 
-Parse given data, return the root element if the givent data is valid, and return false if not valid.
+Parse given data, return true if the givent data is valid, and return false if not.
 
 ## HTMLElement Methods
 
@@ -166,6 +167,10 @@ Get unescaped text value of current node and its children. Like `innerText`.
 
 Get escpaed (as-it) text value of current node and its children. May have
 `&amp;` in it. (fast)
+
+### HTMLElement#tagName
+
+Get tag name of HTMLElement. Notice: the returned value would be an uppercase string.
 
 ### HTMLElement#structuredText
 
