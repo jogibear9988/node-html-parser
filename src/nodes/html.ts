@@ -136,6 +136,13 @@ export default class HTMLElement extends Node {
 			return (pre += cur.rawText);
 		}, '');
 	}
+	public get textContent() {
+		return this.rawText;
+	}
+	public set textContent(val: string) {
+		const content = [new TextNode(val)];
+		this.childNodes = content;
+	}
 	/**
 	 * Get unescaped text value of current node and its children.
 	 * @return {string} text content
@@ -256,7 +263,7 @@ export default class HTMLElement extends Node {
 		function dfs(node: HTMLElement) {
 			const idStr = node.id ? (`#${node.id}`) : '';
 			const classStr = node.classNames.length ? (`.${node.classNames.join('.')}`) : '';
-			write(node.rawTagName + idStr + classStr);
+			write(`${node.rawTagName}${idStr}${classStr}`);
 			indention++;
 			node.childNodes.forEach((childNode) => {
 				if (childNode.nodeType === NodeType.ELEMENT_NODE) {
@@ -438,9 +445,10 @@ export default class HTMLElement extends Node {
 
 	/**
 	 * Get attributes
+	 * @access private
 	 * @return {Object} parsed and unescaped attributes
 	 */
-	public get attributes() {
+	public get attrs() {
 		if (this._attrs) {
 			return this._attrs;
 		}
@@ -449,9 +457,20 @@ export default class HTMLElement extends Node {
 		for (const key in attrs) {
 			const val = attrs[key] || '';
 			//@ts-ignore
-			this._attrs[key] = he.decode(val);
+			this._attrs[key.toLowerCase()] = he.decode(val);
 		}
 		return this._attrs;
+	}
+
+	public get attributes() {
+		const ret_attrs = {} as Record<string, string>;
+		const attrs = this.rawAttributes;
+		for (const key in attrs) {
+			const val = attrs[key] || '';
+			//@ts-ignore
+			ret_attrs[key] = he.decode(val);
+		}
+		return ret_attrs;
 	}
 
 	/**
@@ -492,7 +511,7 @@ export default class HTMLElement extends Node {
 	}
 
 	public hasAttribute(key: string) {
-		return key in this.attributes;
+		return key.toLowerCase() in this.attrs;
 	}
 
 	/**
@@ -500,7 +519,7 @@ export default class HTMLElement extends Node {
 	 * @return {string} value of the attribute
 	 */
 	public getAttribute(key: string): string | undefined {
-		return this.attributes[key];
+		return this.attrs[key.toLowerCase()];
 	}
 
 	/**
@@ -512,11 +531,19 @@ export default class HTMLElement extends Node {
 		if (arguments.length < 2) {
 			throw new Error('Failed to execute \'setAttribute\' on \'Element\'');
 		}
+		const k2 = key.toLowerCase();
 		const attrs = this.rawAttributes;
+		for (const k in attrs) {
+			if (k.toLowerCase() === k2) {
+				key = k;
+				break;
+			}
+		}
 		attrs[key] = String(value);
+		// update this.attrs
 		if (this._attrs) {
 			//@ts-ignore
-			this._attrs[key] = he.decode(attrs[key]);
+			this._attrs[k2] = he.decode(attrs[key]);
 		}
 		// Update rawString
 		this.rawAttrs = Object.keys(attrs).map((name) => {

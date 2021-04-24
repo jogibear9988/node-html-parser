@@ -15,9 +15,12 @@ no closing `<li>`, `<td>` etc).
 
 ## Install
 
+
 ```shell
 npm install --save node-html-parser
 ```
+
+> Note: when using Fast HTML Parser in a Typescript project the minimum Typescript version supported is `^4.1.2`.
 
 ## Performance
 
@@ -128,6 +131,10 @@ parses the specified text as HTML and inserts the resulting nodes into the DOM t
 
 Set `value` to `key` attribute.
 
+### HTMLElement#setAttributes(attrs: Record<string, string>)
+
+Set attributes of the element.
+
 ### HTMLElement#removeAttribute(key: string)
 
 Remove `key` attribute.
@@ -203,3 +210,11 @@ Returns a reference to the next child node of the current element's parent.
 ### HTMLElement#nextElementSibling
 
 Returns a reference to the next child element of the current element's parent.
+
+### HTMLElement#textContent
+
+Get or Set textContent of current element, more efficient than [set_content](#htmlelementset_contentcontent-string--node--node).
+
+### HTMLElement#attributes
+
+Get all attributes of current element. **Notice: do not try to change the returned value.**
