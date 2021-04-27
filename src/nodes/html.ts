@@ -5,6 +5,7 @@ import Matcher from '../matcher.js';
 import arr_back from '../back.js';
 import CommentNode from './comment.js';
 import parse from '../parse.js';
+import { decode } from '@node-projects/lean-he-esm/lib/methods/decode.js'
 
 export interface KeyAttributes {
 	id?: string;
@@ -148,8 +149,7 @@ export default class HTMLElement extends Node {
 	 * @return {string} text content
 	 */
 	public get text() {
-		//@ts-ignore
-		return he.decode(this.rawText);
+		return decode(this.rawText);
 	}
 	/**
 	 * Get structured Text (with '\n' etc.)
@@ -456,8 +456,7 @@ export default class HTMLElement extends Node {
 		const attrs = this.rawAttributes;
 		for (const key in attrs) {
 			const val = attrs[key] || '';
-			//@ts-ignore
-			this._attrs[key.toLowerCase()] = he.decode(val);
+			this._attrs[key.toLowerCase()] = decode(val);
 		}
 		return this._attrs;
 	}
@@ -467,8 +466,7 @@ export default class HTMLElement extends Node {
 		const attrs = this.rawAttributes;
 		for (const key in attrs) {
 			const val = attrs[key] || '';
-			//@ts-ignore
-			ret_attrs[key] = he.decode(val);
+			ret_attrs[key] = decode(val);
 		}
 		return ret_attrs;
 	}
@@ -542,8 +540,7 @@ export default class HTMLElement extends Node {
 		attrs[key] = String(value);
 		// update this.attrs
 		if (this._attrs) {
-			//@ts-ignore
-			this._attrs[k2] = he.decode(attrs[key]);
+			this._attrs[k2] = decode(attrs[key]);
 		}
 		// Update rawString
 		this.rawAttrs = Object.keys(attrs).map((name) => {

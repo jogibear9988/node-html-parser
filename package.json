@@ -1,6 +1,6 @@
 {
 	"name": "@node-projects/node-html-parser-esm",
-	"version": "2.2.1",
+	"version": "2.2.2",
 	"description": "A very fast HTML parser, generating a simplified DOM, with basic element query support.",
 	"main": "dist/index.js",
 	"module": "dist/esm/index.js",
@@ -25,9 +25,6 @@
 		"taoqf<tao_qiufeng@126.com>"
 	],
 	"license": "MIT",
-	"dependencies": {
-		"he": "^1.2.0"
-	},
 	"devDependencies": {
 		"@types/entities": "latest",
 		"@types/he": "latest",
@@ -73,5 +70,8 @@
 	"bugs": {
 		"url": "https://github.com/node-projects/node-html-parser/issues"
 	},
-	"homepage": "https://github.com/node-projects/node-html-parser"
+	"homepage": "https://github.com/node-projects/node-html-parser",
+	"dependencies": {
+		"@node-projects/lean-he-esm": "^3.2.0"
+	}
 }
