@@ -629,7 +629,7 @@ export default class HTMLElement extends Node {
 		}
 	}
 
-	public get nextElementSibling() {
+	public get nextElementSibling(): HTMLElement | null {
 		if (this.parentNode) {
 			const children = this.parentNode.childNodes;
 			let i = 0;
@@ -743,7 +743,13 @@ const frameflag = 'documentfragmentcontainer';
  * @param  {string} data      html
  * @return {HTMLElement}      root element
  */
-export function base_parse(data: string, options = { lowerCaseTagName: false, comment: false } as Partial<Options>) {
+export function base_parse(fragments: string | string[], options = { lowerCaseTagName: false, comment: false } as Partial<Options>) {
+	let data: string;
+	if (Array.isArray(fragments)) {
+		data = fragments.join();
+	} else {
+		data = fragments
+	}
 	const elements = options.blockTextElements || {
 		script: true,
 		noscript: true,
