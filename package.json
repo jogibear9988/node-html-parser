@@ -1,10 +1,17 @@
 {
 	"name": "@node-projects/node-html-parser-esm",
-	"version": "2.2.2",
+	"version": "2.4.0",
 	"description": "A very fast HTML parser, generating a simplified DOM, with basic element query support.",
 	"main": "dist/index.js",
 	"module": "dist/esm/index.js",
 	"types": "dist/index.d.ts",
+	"exports": {
+		".": {
+			"require": "./dist/index.js",
+			"import": "./dist/esm/index.js",
+			"default": "./dist/index.js"
+		}
+	},
 	"scripts": {
 		"test": "mocha",
 		"lint": "eslint ./src/*.ts ./src/**/*.ts",
@@ -33,7 +40,7 @@
 		"@typescript-eslint/eslint-plugin-tslint": "latest",
 		"@typescript-eslint/parser": "latest",
 		"blanket": "latest",
-		"cheerio": "^1.0.0-rc.5",
+		"cheerio": "^1.0.0-rc.10",
 		"del-cli": "latest",
 		"eslint": "latest",
 		"eslint-config-prettier": "latest",
@@ -41,12 +48,14 @@
 		"high5": "^1.0.0",
 		"htmlparser": "^1.7.7",
 		"htmlparser-benchmark": "^1.1.3",
-		"htmlparser2": "^5.0.0",
+		"htmlparser2": "^7.2.0",
+		"jest": "^27.3.1",
 		"mocha": "latest",
 		"parse5": "^6.0.1",
 		"should": "latest",
 		"spec": "latest",
 		"travis-cov": "latest",
+		"ts-jest": "^27.0.7",
 		"typescript": "next"
 	},
 	"config": {
@@ -72,6 +81,6 @@
 	},
 	"homepage": "https://github.com/node-projects/node-html-parser",
 	"dependencies": {
-		"@node-projects/lean-he-esm": "^3.2.0"
+		"@node-projects/lean-he-esm": "^3.3.0"
 	}
 }
