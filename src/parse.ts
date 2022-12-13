@@ -1,5 +1,5 @@
-import arr_back from './back';
-import { base_parse, Options } from './nodes/html';
+import arr_back from './back.js';
+import { base_parse, Options } from './nodes/html.js';
 
 /**
  * Parses HTML and returns a root element
