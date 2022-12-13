@@ -19,4 +19,5 @@ export default abstract class Node {
 	public set textContent(val: string) {
 		this.rawText = val;
 	}
+	public position?: { start: number, lengthStartTag?: number, length: number }
 }

@@ -782,14 +782,18 @@ export function base_parse(fragments: string | string[], options = { lowerCaseTa
 	let match: RegExpExecArray;
 	// https://github.com/taoqf/node-html-parser/issues/38
 	data = `<${frameflag}>${data}</${frameflag}>`;
+	const offset = `<${frameflag}>`.length;
 	while ((match = kMarkupPattern.exec(data))) {
 		if (lastTextPos > -1) {
 			if (lastTextPos + match[0].length < kMarkupPattern.lastIndex) {
 				// if has content
 				const text = data.substring(lastTextPos, kMarkupPattern.lastIndex - match[0].length);
-				currentParent.appendChild(new TextNode(text));
+				const el = new TextNode(text);
+				currentParent.appendChild(el);
+				el.position = { start: lastTextPos - text.length - offset, length: text.length };
 			}
 		}
+		const prevPos = lastTextPos;
 		lastTextPos = kMarkupPattern.lastIndex;
 		if (match[2] === frameflag) {
 			continue;
@@ -799,7 +803,9 @@ export function base_parse(fragments: string | string[], options = { lowerCaseTa
 			if (options.comment) {
 				// Only keep what is in between <!-- and -->
 				const text = data.substring(lastTextPos - 3, lastTextPos - match[0].length + 4);
-				currentParent.appendChild(new CommentNode(text));
+				const el = new CommentNode(text);
+				currentParent.appendChild(el);
+				el.position = { start: lastTextPos - text.length - offset, length: text.length };
 			}
 			continue;
 		}
@@ -822,7 +828,9 @@ export function base_parse(fragments: string | string[], options = { lowerCaseTa
 			}
 			// ignore container tag we add above
 			// https://github.com/taoqf/node-html-parser/issues/38
-			currentParent = currentParent.appendChild(new HTMLElement(match[2], attrs, match[3]));
+			const el = new HTMLElement(match[2], attrs, match[3]);
+			el.position = { start: prevPos - offset, lengthStartTag: match[0].length, length: -1 };
+			currentParent = currentParent.appendChild(el);
 			stack.push(currentParent);
 			if (is_block_text_element(match[2])) {
 				// a little test to find next </script> or </style> ...
@@ -842,7 +850,9 @@ export function base_parse(fragments: string | string[], options = { lowerCaseTa
 						text = data.substring(kMarkupPattern.lastIndex, index);
 					}
 					if (text.length > 0) {
-						currentParent.appendChild(new TextNode(text));
+						const el = new TextNode(text)
+						currentParent.appendChild(el);
+						el.position = { start: kMarkupPattern.lastIndex - offset, length: text.length };
 					}
 				}
 				if (index === -1) {
@@ -858,6 +868,7 @@ export function base_parse(fragments: string | string[], options = { lowerCaseTa
 			while (true) {
 				if (currentParent.rawTagName === match[2]) {
 					stack.pop();
+					currentParent.position.length = lastTextPos - currentParent.position.start - offset + match[0].length;
 					currentParent = arr_back(stack);
 					break;
 				} else {
@@ -866,6 +877,7 @@ export function base_parse(fragments: string | string[], options = { lowerCaseTa
 					if (kElementsClosedByClosing[tagName]) {
 						if (kElementsClosedByClosing[tagName][match[2]]) {
 							stack.pop();
+							currentParent.position.length = lastTextPos - currentParent.position.start - offset + match[0].length;
 							currentParent = arr_back(stack);
 							continue;
 						}
