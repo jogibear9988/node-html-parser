@@ -1,14 +1,13 @@
 {
 	"name": "@node-projects/node-html-parser-esm",
-	"version": "2.5.0",
+	"version": "2.5.1",
 	"description": "A very fast HTML parser, generating a simplified DOM, with basic element query support.",
 	"main": "dist/index.js",
-	"module": "dist/esm/index.js",
+	"module": "dist/index.js",
 	"types": "dist/index.d.ts",
 	"exports": {
 		".": {
-			"require": "./dist/index.js",
-			"import": "./dist/esm/index.js",
+			"import": "./dist/index.js",
 			"default": "./dist/index.js"
 		}
 	},
