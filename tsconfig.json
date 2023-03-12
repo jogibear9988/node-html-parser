@@ -3,8 +3,8 @@
 		"./src/"
 	],
 	"compilerOptions": {
-		"module": "commonjs",
-		"target": "es5",
+		"module": "esnext",
+		"target": "esnext",
 		"noImplicitAny": true,
 		"sourceMap": false,
 		"emitDecoratorMetadata": true,
