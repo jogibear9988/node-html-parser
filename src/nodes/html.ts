@@ -1,12 +1,10 @@
-import { selectAll, selectOne } from 'css-select';
-import he from 'he';
-import arr_back from '../back';
-import Matcher from '../matcher';
-import VoidTag from '../void-tag';
-import CommentNode from './comment';
-import Node from './node';
-import TextNode from './text';
-import NodeType from './type';
+import arr_back from '../back.js';
+import VoidTag from '../void-tag.js';
+import CommentNode from './comment.js';
+import Node from './node.js';
+import TextNode from './text.js';
+import NodeType from './type.js';
+import { decode } from '@node-projects/lean-he-esm/lib/methods/decode.js'
 
 type IRawTagName =
 	| 'LI'
@@ -31,11 +29,6 @@ type IRawTagName =
 	| 'h4'
 	| 'h5'
 	| 'h6';
-
-function decode(val: string) {
-	// clone string
-	return JSON.parse(JSON.stringify(he.decode(val))) as string;
-}
 
 export interface KeyAttributes {
 	id?: string;
@@ -453,30 +446,6 @@ export default class HTMLElement extends Node {
 	}
 
 	/**
-	 * Query CSS selector to find matching nodes.
-	 * @param  {string}         selector Simplified CSS selector
-	 * @return {HTMLElement[]}  matching elements
-	 */
-	public querySelectorAll(selector: string): HTMLElement[] {
-		return selectAll(selector, this as HTMLElement, {
-			xmlMode: true,
-			adapter: Matcher,
-		});
-	}
-
-	/**
-	 * Query CSS Selector to find matching node.
-	 * @param  {string}         selector Simplified CSS selector
-	 * @return {(HTMLElement|null)}    matching node
-	 */
-	public querySelector(selector: string): HTMLElement | null {
-		return selectOne(selector, this as HTMLElement, {
-			xmlMode: true,
-			adapter: Matcher,
-		});
-	}
-
-	/**
 	 * find elements by their tagName
 	 * @param {string} tagName the tagName of the elements to select
 	 */
@@ -562,64 +531,6 @@ export default class HTMLElement extends Node {
 			}
 		}
 
-		return null;
-	}
-
-	/**
-	 * traverses the Element and its parents (heading toward the document root) until it finds a node that matches the provided selector string. Will return itself or the matching ancestor. If no such element exists, it returns null.
-	 * @param selector a DOMString containing a selector list
-	 */
-	public closest(selector: string) {
-		type Predicate = (node: Node) => node is HTMLElement;
-
-		const mapChild = new Map<Node, Node>();
-		let el = this as Node;
-		let old = null as Node;
-		function findOne(test: Predicate, elems: Node[]) {
-			let elem = null as HTMLElement | null;
-
-			for (let i = 0, l = elems.length; i < l && !elem; i++) {
-				const el = elems[i];
-				if (test(el)) {
-					elem = el;
-				} else {
-					const child = mapChild.get(el);
-					if (child) {
-						elem = findOne(test, [child]);
-					}
-				}
-			}
-			return elem;
-		}
-		while (el) {
-			mapChild.set(el, old);
-			old = el;
-			el = el.parentNode;
-		}
-		el = this;
-		while (el) {
-			const e = selectOne(selector, el, {
-				xmlMode: true,
-				adapter: {
-					...Matcher,
-					getChildren(node: Node) {
-						const child = mapChild.get(node);
-						return child && [child];
-					},
-					getSiblings(node: Node) {
-						return [node];
-					},
-					findOne,
-					findAll(): Node[] {
-						return [];
-					},
-				},
-			});
-			if (e) {
-				return e as HTMLElement;
-			}
-			el = el.parentNode;
-		}
 		return null;
 	}
 

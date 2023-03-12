@@ -1,6 +1,7 @@
-import { decode, encode } from 'he';
-import NodeType from './type';
-import HTMLElement from './html';
+import { decode } from '@node-projects/lean-he-esm/lib/methods/decode.js';
+import { encode } from '@node-projects/lean-he-esm/lib/methods/encode.js';
+import NodeType from './type.js';
+import HTMLElement from './html.js';
 
 /**
  * Node Class as base class for TextNode and HTMLElement.

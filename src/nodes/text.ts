@@ -1,7 +1,7 @@
-import { decode } from 'he';
-import HTMLElement from './html';
-import Node from './node';
-import NodeType from './type';
+import { decode } from '@node-projects/lean-he-esm/lib/methods/decode.js';
+import HTMLElement from './html.js';
+import Node from './node.js';
+import NodeType from './type.js';
 
 /**
  * TextNode to contain a text element in DOM tree.

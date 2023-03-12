@@ -1,6 +1,6 @@
-import HTMLElement from './html';
-import Node from './node';
-import NodeType from './type';
+import HTMLElement from './html.js';
+import Node from './node.js';
+import NodeType from './type.js';
 
 export default class CommentNode extends Node {
 	public clone(): CommentNode {
