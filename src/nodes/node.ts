@@ -1,5 +1,5 @@
-import { decode } from '@node-projects/lean-he-esm/lib/methods/decode.js';
-import { encode } from '@node-projects/lean-he-esm/lib/methods/encode.js';
+import { decode } from '@node-projects/lean-he-esm';
+import { encode } from '@node-projects/lean-he-esm';
 import NodeType from './type.js';
 import HTMLElement from './html.js';
 

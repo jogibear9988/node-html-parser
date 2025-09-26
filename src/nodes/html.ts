@@ -4,7 +4,7 @@ import CommentNode from './comment.js';
 import Node from './node.js';
 import TextNode from './text.js';
 import NodeType from './type.js';
-import { decode } from '@node-projects/lean-he-esm/lib/methods/decode.js'
+import { decode } from '@node-projects/lean-he-esm'
 
 type IRawTagName =
 	| 'LI'
@@ -163,7 +163,7 @@ export default class HTMLElement extends Node {
 	 */
 	public constructor(
 		tagName: string,
-		keyAttrs: KeyAttributes,
+		keyAttrs: KeyAttributes = {},
 		public rawAttrs = '',
 		parentNode: HTMLElement | null,
 		range: [number, number],
@@ -999,7 +999,7 @@ export function base_parse(data: string, options = {} as Partial<Options>) {
 		// Handle opening tags (ie. <this> not </that>)
 		if (!leadingSlash) {
 			/* Populate attributes */
-			const attrs = {};
+			const attrs: Record<string, string> = {};
 			for (let attMatch; (attMatch = kAttributePattern.exec(attributes));) {
 				const { 1: key, 2: val } = attMatch;
 				const isQuoted = val[0] === `'` || val[0] === `"`;
@@ -1009,6 +1009,7 @@ export function base_parse(data: string, options = {} as Partial<Options>) {
 			const parentTagName = currentParent.rawTagName as IRawTagName;
 
 			if (!closingSlash && kElementsClosedByOpening[parentTagName]) {
+				//@ts-ignore
 				if (kElementsClosedByOpening[parentTagName][tagName]) {
 					stack.pop();
 					currentParent = arr_back(stack);
@@ -1059,6 +1060,7 @@ export function base_parse(data: string, options = {} as Partial<Options>) {
 		}
 
 		// Handle closing tags or self-closed elements (ie </tag> or <br>)
+		//@ts-ignore
 		if (leadingSlash || closingSlash || kSelfClosingElements[tagName]) {
 			while (true) {
 				if (noNestedTagIndex != null && (tagName === 'a' || tagName === 'A')) noNestedTagIndex = undefined;
@@ -1072,6 +1074,7 @@ export function base_parse(data: string, options = {} as Partial<Options>) {
 					const parentTagName = currentParent.tagName as 'LI' | 'A' | 'B' | 'I' | 'P' | 'TD' | 'TH';
 					// Trying to close current tag, and move on
 					if (kElementsClosedByClosing[parentTagName]) {
+						//@ts-ignore
 						if (kElementsClosedByClosing[parentTagName][tagName]) {
 							stack.pop();
 							currentParent = arr_back(stack);

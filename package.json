@@ -1,6 +1,6 @@
 {
 	"name": "@node-projects/node-html-parser-esm",
-	"version": "6.2.0",
+	"version": "6.4.0",
 	"description": "A very fast HTML parser, generating a simplified DOM, with basic element query support.",
 	"main": "dist/index.js",
 	"module": "dist/index.js",
@@ -19,7 +19,9 @@
 		"ts:esm": "tsc -d false",
 		"build": "npm run clean && npm run ts:esm",
 		"dev": "tsc -w",
-		"pretest": "tsc -m commonjs"
+		"pretest": "tsc -m commonjs",
+		"prepublishOnly": "npm run build && npm run bundle",
+		"bundle": "esbuild ./dist/index.js --format=esm --minify --external:@node-projects/* --platform=neutral --bundle --outfile=./dist/index-min.js"
 	},
 	"keywords": [
 		"parser",
@@ -56,7 +58,8 @@
 		"spec": "latest",
 		"travis-cov": "latest",
 		"ts-jest": "^29.0.3",
-		"typescript": "next"
+		"typescript": "next",
+		"esbuild": "^0.25.10"
 	},
 	"config": {
 		"blanket": {
@@ -81,6 +84,6 @@
 	},
 	"homepage": "https://github.com/node-projects/node-html-parser",
 	"dependencies": {
-		"@node-projects/lean-he-esm": "^3.3.0"
+		"@node-projects/lean-he-esm": "^3.4.0"
 	}
 }
