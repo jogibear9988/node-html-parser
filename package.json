@@ -1,6 +1,6 @@
 {
 	"name": "@node-projects/node-html-parser-esm",
-	"version": "6.4.0",
+	"version": "6.4.1",
 	"description": "A very fast HTML parser, generating a simplified DOM, with basic element query support.",
 	"main": "dist/index.js",
 	"module": "dist/index.js",
@@ -84,6 +84,6 @@
 	},
 	"homepage": "https://github.com/node-projects/node-html-parser",
 	"dependencies": {
-		"@node-projects/lean-he-esm": "^3.4.0"
+		"@node-projects/lean-he-esm": "^3.4.1"
 	}
 }
